@@ -258,6 +258,6 @@ gradle-app.setting
 !gradle-wrapper.jar
 
 #################
-## Pore
+## Quartz
 #################
-Porekit
+workspace/

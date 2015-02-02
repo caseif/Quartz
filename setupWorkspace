@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+echo "Initializing Git submodules..."
+git submodule update --init --recursive
+cd src/main/java
+javac net/caseif/quartz/prep/VanillaServerDownloader.java net/caseif/quartz/prep/SrgDownloader.java
+java net.caseif.quartz.prep.VanillaServerDownloader ../../../workspace
+java net.caseif.quartz.prep.SrgDownloader ../../../workspace
