@@ -1,7 +1,31 @@
 #!/usr/bin/bash
-echo "Initializing Git submodules..."
+mcVersion="1.8"
+echo "Initializing/Updating Git submodules..."
 git submodule update --init --recursive
-cd src/main/java
-javac net/caseif/quartz/prep/VanillaServerDownloader.java net/caseif/quartz/prep/SrgDownloader.java
-java net.caseif.quartz.prep.VanillaServerDownloader ../../../workspace
-java net.caseif.quartz.prep.SrgDownloader ../../../workspace
+
+echo "Compiling preparation files..."
+
+# javac won't run if the target directory doesn't exist as a directory
+[ -f  workspace ] && rm workspace # delete if normal file
+[ -d workspace ] || mkdir workspace # create if not exists
+[ -f  workspace/java ] && rm workspace/java # delete if not normal file
+[ -d workspace/java ] || mkdir workspace/java # create if not exists
+
+cd src/main/java # cd to the source directory
+# compile all needed classes at once
+javac -d ../../../workspace/java net/caseif/quartz/prep/Downloader.java net/caseif/quartz/prep/Extractor.java net/caseif/quartz/prep/VanillaServerDownloader.java net/caseif/quartz/prep/SrgDownloader.java net/caseif/quartz/prep/SrgToolsDownloader.java
+cd ../../../workspace/java
+
+echo "Running VanillaServerDownloader..."
+java net.caseif.quartz.prep.VanillaServerDownloader -d ../ -o
+
+echo "Running SrgDownloader..."
+java net.caseif.quartz.prep.SrgDownloader -d ../ -o
+
+echo "Running SrgToolDownloader..."
+java net.caseif.quartz.prep.SrgToolsDownloader -d ../ -o
+
+cd ../
+
+echo "Deobfuscating vanilla server..."
+java -jar lib/srgtool-2.0.jar apply --srg workspace/srg/notch-mcp.srg --in lib/minecraft_server-$mcVersion.jar --inheritance lib/minecraft_server-$mcVersion.jar --out lib/minecraft_server-deobf-$mcVersion.jar

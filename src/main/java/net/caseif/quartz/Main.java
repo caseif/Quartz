@@ -26,10 +26,13 @@ package net.caseif.quartz;
 
 import net.caseif.quartz.prep.SrgDownloader;
 import net.caseif.quartz.prep.VanillaServerDownloader;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.simple.SimpleLogger;
-import org.apache.logging.log4j.util.PropertiesUtil;
+import net.caseif.quartz.util.QuartzUtil;
+import nl.hardijzer.fw.applysrg.ApplySrg;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
 
 public class Main {
 
@@ -38,13 +41,29 @@ public class Main {
 	public static final Logger log;
 
 	static {
-		log = new SimpleLogger("Quartz", Level.INFO, true, true, true, false, "", null, PropertiesUtil.getProperties(),
-				System.out);
+		log = LoggerFactory.getLogger(Main.class);
 	}
 
 	public static void main(String[] args) {
 		VanillaServerDownloader.main();
 		SrgDownloader.main();
+		File deobf = new File("lib/minecraft_server-deobf-" + MC_VERSION + ".jar");
+		if (deobf.exists()) {
+			try {
+				ApplySrg.main(new String[]{
+						"--srg", "workspace/srg/notch-mcp.srg",
+						"--in", "lib/minecraft_server-$mcVersion.jar",
+						"--inheritance", "lib/minecraft_server-$mcVersion.jar",
+						"--out", "lib/minecraft_server-deobf-$mcVersion.jar"
+				});
+			}
+			catch (IOException ex) {
+				ex.printStackTrace();
+				System.err.println("Failed to deobfuscate vanilla server!");
+				System.exit(1);
+			}
+			QuartzUtil.restart();
+		}
 	}
 
 }

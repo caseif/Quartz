@@ -25,13 +25,8 @@
 package net.caseif.quartz.prep;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
-public class SrgDownloader {
-
-	static final String MC_VERSION = "1.8";
+public class SrgToolsDownloader {
 
 	public static void main(String... args) {
 		boolean overwrite = false;
@@ -46,28 +41,14 @@ public class SrgDownloader {
 				}
 			}
 		}
-		final File file = new File(dir + "/workspace/srg/notch-mcp-" + MC_VERSION + ".zip");
-		if (file.exists() && !overwrite) {
-			System.out.println("Already have local copy of deobfuscation mappings");
+		final File jar = new File(dir + "/lib/srgtool-2.0.jar");
+		if (jar.exists() && !overwrite) {
+			System.out.println("Already have local copy of SrgTools");
 			return;
 		}
-		Downloader dl = new Downloader("https://www.dropbox.com/s/qfqpti9hmflofdh/notch-mcp-1.8.zip?dl=1",
-				"obfuscation mappings");
-		dl.download(file);
-		try {
-			System.out.println("Extracting deobfuscation mappings, please wait...");
-			Extractor ex = new Extractor(new ZipFile(file));
-			ex.extractAll(new File(dir, "workspace/srg"));
-		}
-		catch (IOException ex) {
-			ex.printStackTrace();
-			System.err.println("Failed to extract deobfuscation mappings!");
-			System.exit(1);
-		}
-	}
-
-	private static void unzip(ZipFile zip, ZipEntry entry, File dest) throws IOException {
-
+		Downloader dl = new Downloader("https://bitbucket.org/agaricusb/srgtools/downloads/srgtool-2.0.jar",
+				"SrgTools");
+		dl.download(jar);
 	}
 
 }

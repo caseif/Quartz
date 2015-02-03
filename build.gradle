@@ -20,13 +20,8 @@ targetCompatibility = 1.6
 // Project repositories
 repositories {
     mavenCentral()
-    maven {
-        name = 'forge-repo'
-        url = 'http://files.minecraftforge.net/maven/'
-    }
-    maven {
-        name = 'minecraft'
-        url = 'https://libraries.minecraft.net/'
+	flatDir {
+        dirs 'workspace/lib'
     }
 }
 
@@ -34,8 +29,8 @@ repositories {
 dependencies {
     compile project('SpongeAPI')
     //compile project('Mixin')
-	compile 'net.minecraftforge.srg2source:Srg2Source:3.2-SNAPSHOT'
-	compile 'net.minecraft:launchwrapper:1.11'
+	compile ':minecraft_server-deobf:1.8'
+	compile ':srgtool:2.0'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
@@ -57,11 +52,20 @@ test {
 
 jar {
     classifier = 'base'
+	manifest {
+		attributes(
+				'Implementation-Title': project.name,
+				'Implementation-Version': version,
+				'Main-Class': 'net.caseif.quartz.Main',
+				'Class-Path': 'lib/minecraft_server-deobf-1.8'
+		)
+	}
 }
 
 shadowJar {
     dependencies {
-    }
+		exclude dependency(':minecraft_server-deobf:1.8')
+	}
 	classifier = ''
 }
 

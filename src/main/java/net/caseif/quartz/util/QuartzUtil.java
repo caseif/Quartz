@@ -22,52 +22,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.caseif.quartz.prep;
+package net.caseif.quartz.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 
-public class SrgDownloader {
+public class QuartzUtil {
 
-	static final String MC_VERSION = "1.8";
-
-	public static void main(String... args) {
-		boolean overwrite = false;
-		String dir = ".";
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].equalsIgnoreCase("-o") || args[i].equalsIgnoreCase("--overwrite")) {
-				overwrite = true;
-			}
-			else if (args[i].equalsIgnoreCase("-d") || args[i].equalsIgnoreCase("--dir")) {
-				if (args.length >= i) {
-					dir = args[i + 1];
-				}
-			}
-		}
-		final File file = new File(dir + "/workspace/srg/notch-mcp-" + MC_VERSION + ".zip");
-		if (file.exists() && !overwrite) {
-			System.out.println("Already have local copy of deobfuscation mappings");
-			return;
-		}
-		Downloader dl = new Downloader("https://www.dropbox.com/s/qfqpti9hmflofdh/notch-mcp-1.8.zip?dl=1",
-				"obfuscation mappings");
-		dl.download(file);
+	/**
+	 * Relaunches the current Java program.
+	 */
+	public static void restart() {
 		try {
-			System.out.println("Extracting deobfuscation mappings, please wait...");
-			Extractor ex = new Extractor(new ZipFile(file));
-			ex.extractAll(new File(dir, "workspace/srg"));
+		final String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+		final File currentJar = new File(QuartzUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+
+  /* is it a jar file? */
+		if(!currentJar.getName().endsWith(".jar"))
+			return;
+
+  /* Build command: java -jar application.jar */
+		final ArrayList<String> command = new ArrayList<String>();
+		command.add(javaBin);
+		command.add("-jar");
+		command.add(currentJar.getPath());
+
+		final ProcessBuilder builder = new ProcessBuilder(command);
+			builder.start();
 		}
 		catch (IOException ex) {
 			ex.printStackTrace();
-			System.err.println("Failed to extract deobfuscation mappings!");
-			System.exit(1);
+			System.err.println("Failed to restart program!");
+			return;
 		}
-	}
-
-	private static void unzip(ZipFile zip, ZipEntry entry, File dest) throws IOException {
-
+		catch (URISyntaxException ex) {
+			ex.printStackTrace();
+			System.err.println("Failed to restart program!");
+			return;
+		}
+		System.exit(0);
 	}
 
 }
