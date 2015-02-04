@@ -1,6 +1,6 @@
-/*
+/**
  * Quartz
- * Copyright (c) 2014-2015, Maxim Roncacé <mproncace@gmail.com>
+ * Copyright (c) 2015, Maxim Roncacé <mproncace@gmail.com>
  *
  * The MIT License
  *
@@ -22,33 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.caseif.quartz.prep;
-
-import java.io.File;
-
-public class SrgToolsDownloader {
-
-	public static void main(String... args) {
-		boolean overwrite = false;
-		String dir = ".";
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].equalsIgnoreCase("-o") || args[i].equalsIgnoreCase("--overwrite")) {
-				overwrite = true;
-			}
-			else if (args[i].equalsIgnoreCase("-d") || args[i].equalsIgnoreCase("--dir")) {
-				if (args.length >= i) {
-					dir = args[i + 1];
-				}
-			}
-		}
-		final File jar = new File(dir + "/lib/srgtool-2.0.jar");
-		if (jar.exists() && !overwrite) {
-			System.out.println("Already have local copy of SrgTools");
-			return;
-		}
-		Downloader dl = new Downloader("https://bitbucket.org/agaricusb/srgtools/downloads/srgtool-2.0.jar",
-				"SrgTools");
-		dl.download(jar);
-	}
-
+{
+  "package": "net.caseif.quartz.mixin",
+  "refmap": "mixins.quartz.refmap.json",
+  "mixins": [
+  ]
 }

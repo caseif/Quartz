@@ -1,31 +1,33 @@
-#!/usr/bin/bash
+#!/bin/bash
 mcVersion="1.8"
-echo "Initializing/Updating Git submodules..."
+echo "Initializing/Updating Git submodules"
 git submodule update --init --recursive
 
-echo "Compiling preparation files..."
+echo "Compiling Java utility classes"
 
-# javac won't run if the target directory doesn't exist as a directory
-[ -f  workspace ] && rm workspace # delete if normal file
-[ -d workspace ] || mkdir workspace # create if not exists
-[ -f  workspace/java ] && rm workspace/java # delete if not normal file
-[ -d workspace/java ] || mkdir workspace/java # create if not exists
+# javac won't run if the target doesn't exist as a directory
+[ -f  ./workspace ] && rm ./workspace # delete if normal file
+[ -d ./workspace ] || mkdir ./workspace # create if not exists
+[ -f  ./workspace/java ] && rm ./workspace/java # delete if normal file
+[ -d ./workspace/java ] || mkdir ./workspace/java # create if not exists
 
-cd src/main/java # cd to the source directory
-# compile all needed classes at once
-javac -d ../../../workspace/java net/caseif/quartz/prep/Downloader.java net/caseif/quartz/prep/Extractor.java net/caseif/quartz/prep/VanillaServerDownloader.java net/caseif/quartz/prep/SrgDownloader.java net/caseif/quartz/prep/SrgToolsDownloader.java
-cd ../../../workspace/java
+cd ./src/main/java # ./src/main/java/
+# compile required utility classes
+javac -d ../../../workspace/java ./net/caseif/quartz/util/Downloader.java
+cd ../../../workspace/java/ # ./workspace/java/
 
-echo "Running VanillaServerDownloader..."
-java net.caseif.quartz.prep.VanillaServerDownloader -d ../ -o
+# download vanilla server
+java net.caseif.quartz.util.Downloader -u https://s3.amazonaws.com/Minecraft.Download/versions/$mcVersion/minecraft_server.$mcVersion.jar -o ../lib/minecraft_server-$mcVersion.jar -n "vanilla server" -ow
 
-echo "Running SrgDownloader..."
-java net.caseif.quartz.prep.SrgDownloader -d ../ -o
+# download deobfuscation mappings
+java net.caseif.quartz.util.Downloader -u https://gist.githubusercontent.com/caseif/0783637f20fd8195635d/raw/notch-mcp-1.8.srg -o ../lib/srg/notch-mcp.srg -n "deobfuscation mappings" -ow
 
-echo "Running SrgToolDownloader..."
-java net.caseif.quartz.prep.SrgToolsDownloader -d ../ -o
+# download SrgTools
+java net.caseif.quartz.util.Downloader -u https://bitbucket.org/agaricusb/srgtools/downloads/srgtool-2.0.jar -o ../lib/srgtool-2.0.jar -n "SrgTools" -ow
 
-cd ../
+cd ../ # ./workspace/
 
-echo "Deobfuscating vanilla server..."
-java -jar lib/srgtool-2.0.jar apply --srg workspace/srg/notch-mcp.srg --in lib/minecraft_server-$mcVersion.jar --inheritance lib/minecraft_server-$mcVersion.jar --out lib/minecraft_server-deobf-$mcVersion.jar
+echo "Deobfuscating server"
+java -jar ./lib/srgtool-2.0.jar apply --srg ./lib/srg/notch-mcp.srg --in ./lib/minecraft_server-$mcVersion.jar --inheritance ./lib/minecraft_server-$mcVersion.jar --out ./lib/minecraft_server-deobf-$mcVersion.jar
+
+echo "Done!"

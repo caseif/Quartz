@@ -1,6 +1,6 @@
 /*
  * Quartz
- * Copyright (c) 2014-2015, Maxim Roncacé <mproncace@gmail.com>
+ * Copyright (c) 2015, Maxim Roncacé <mproncace@gmail.com>
  *
  * The MIT License
  *
@@ -24,45 +24,5 @@
  */
 package net.caseif.quartz.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-
 public class QuartzUtil {
-
-	/**
-	 * Relaunches the current Java program.
-	 */
-	public static void restart() {
-		try {
-		final String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
-		final File currentJar = new File(QuartzUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-
-  /* is it a jar file? */
-		if(!currentJar.getName().endsWith(".jar"))
-			return;
-
-  /* Build command: java -jar application.jar */
-		final ArrayList<String> command = new ArrayList<String>();
-		command.add(javaBin);
-		command.add("-jar");
-		command.add(currentJar.getPath());
-
-		final ProcessBuilder builder = new ProcessBuilder(command);
-			builder.start();
-		}
-		catch (IOException ex) {
-			ex.printStackTrace();
-			System.err.println("Failed to restart program!");
-			return;
-		}
-		catch (URISyntaxException ex) {
-			ex.printStackTrace();
-			System.err.println("Failed to restart program!");
-			return;
-		}
-		System.exit(0);
-	}
-
 }
