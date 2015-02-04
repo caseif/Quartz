@@ -1,6 +1,6 @@
 rootProject.name = 'Quartz'
 
 include 'SpongeAPI'
-//include 'Mixin'
+include 'Mixin'
 project(':SpongeAPI').projectDir = file('SpongeAPI')
-//project(':Mixin').projectDir = file('Mixin')
+project(':Mixin').projectDir = file('Mixin')

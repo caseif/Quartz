@@ -20,7 +20,18 @@ targetCompatibility = 1.6
 // Project repositories
 repositories {
     mavenCentral()
+    maven {
+        // required by Mixin
+        name = "forge-repo"
+        url = "http://files.minecraftforge.net/maven/"
+    }
+    maven {
+        // required by Mixin
+        name = "minecraft-repo"
+        url = "https://libraries.minecraft.net/"
+    }
 	flatDir {
+		// contains deobfuscated minecraft_server and SrgTools
         dirs 'workspace/lib'
     }
 }
@@ -28,7 +39,7 @@ repositories {
 // Project dependencies
 dependencies {
     compile project('SpongeAPI')
-    //compile project('Mixin')
+    compile project('Mixin')
 	compile ':minecraft_server-deobf:1.8'
 	compile ':srgtool:2.0'
 	compile 'org.slf4j:slf4j-simple:1.7.10'
@@ -98,7 +109,7 @@ project('SpongeAPI') {
 }
 
 // Disable tests and checkstyle for Mixin
-/*project('Mixin') {
+project('Mixin') {
     afterEvaluate { project ->
         configure([assemble, build, compileTestJava, javadoc, javadocJar, sourceJar, licenseFormat]) {
             enabled = false
@@ -110,4 +121,4 @@ project('SpongeAPI') {
             enabled = false
         }
     }
-}*/
+}
