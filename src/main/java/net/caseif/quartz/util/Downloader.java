@@ -111,16 +111,12 @@ public class Downloader {
 	 */
 	public static void download(final URL url, final File dest, String name, boolean overwrite) throws IOException {
 		final String fName = name == null ? dest.getName() : name;
-		if (dest.exists()) {
-			if (overwrite) {
-				dest.delete();
-			}
-			else {
-				System.err.println("Destination file already exists!");
-				return;
-			}
+		if (dest.exists() && !overwrite) {
+			System.err.println("Destination file already exists!");
+			return;
 		}
-		dest.getParentFile().mkdirs();
+		final File temp = new File(dest.getParentFile(), dest.getName() + ".download");
+		temp.getParentFile().mkdirs();
 		System.out.println("Downloading " + fName + ", please wait...");
 		int tempSize = getFileSize(url);
 		final int size = tempSize > 0 ? tempSize : -1;
@@ -134,13 +130,13 @@ public class Downloader {
 						System.err.println("Cannot open connection to " + url.getHost() + "!");
 						System.exit(1);
 					}
-					os = new FileOutputStream(dest.getCanonicalPath());
+					os = new FileOutputStream(temp.getCanonicalPath());
 					conn.connect();
 					rbc = Channels.newChannel(conn.getInputStream());
-					dest.setReadable(true, false);
-					dest.setWritable(true, false);
-					dest.getParentFile().mkdirs();
-					dest.createNewFile();
+					temp.setReadable(true, false);
+					temp.setWritable(true, false);
+					temp.getParentFile().mkdirs();
+					temp.createNewFile();
 					os.getChannel().transferFrom(rbc, 0, size > 0 ? size : Integer.MAX_VALUE);
 				}
 				catch (IOException ex) {
@@ -172,7 +168,7 @@ public class Downloader {
 				callbackException = null;
 				throw up; // haha
 			}
-			long length = dest.length();
+			long length = temp.length();
 			int percent = (int)Math.floor(length / (double)size * 100);
 			speed = length - lastSize;
 			if (speeds.size() > AVERAGE_PERIOD_IN_SECONDS)
@@ -236,10 +232,16 @@ public class Downloader {
 			sb.append('=');
 		}
 		sb.append("] ");
-		sb.append((size < 0 ? dest.length() : size) / 1024).append("/").append(size / (size < 0 ? 1 : 1024)).append("kb");
+		sb.append((size < 0 ? temp.length() : size) / 1024).append("/").append(size / (size < 0 ? 1 : 1024))
+				.append("kb");
 		for (int i = sb.length(); i <= lineLength; i++) {
 			sb.append(' ');
 		}
+		dest.delete();
+		temp.renameTo(new File(
+				temp.getParentFile(),
+				temp.getName().substring(0, temp.getName().length() - ".download".length())
+		));
 		System.out.println("\r" + sb.toString());
 		System.out.println("Successfully downloaded " + fName + "!");
 	}

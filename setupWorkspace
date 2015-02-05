@@ -7,27 +7,57 @@ echo "Compiling Java utility classes"
 
 # javac won't run if the target doesn't exist as a directory
 [ -f  ./workspace ] && rm ./workspace # delete if normal file
+[ -d  ./workspace ] && rm -r ./workspace # delete if directory, too
 [ -d ./workspace ] || mkdir ./workspace # create if not exists
 [ -f  ./workspace/java ] && rm ./workspace/java # delete if normal file
 [ -d ./workspace/java ] || mkdir ./workspace/java # create if not exists
 
 cd ./src/main/java # ./src/main/java/
 # compile required utility classes
-javac -d ../../../workspace/java ./net/caseif/quartz/util/Downloader.java
+javac -d ../../../workspace/java \
+./net/caseif/quartz/util/Downloader.java \
+./net/caseif/quartz/util/Extractor.java \
+./net/caseif/quartz/util/SrgTweaker.java
 cd ../../../workspace/java/ # ./workspace/java/
 
 # download vanilla server
-java net.caseif.quartz.util.Downloader -u https://s3.amazonaws.com/Minecraft.Download/versions/$mcVersion/minecraft_server.$mcVersion.jar -o ../lib/minecraft_server-$mcVersion.jar -n "vanilla server" -ow
+java net.caseif.quartz.util.Downloader \
+-u https://s3.amazonaws.com/Minecraft.Download/versions/$mcVersion/minecraft_server.$mcVersion.jar \
+-o ../lib/minecraft_server-$mcVersion.jar \
+-n "vanilla server" \
+-ow
 
-# download deobfuscation mappings
-java net.caseif.quartz.util.Downloader -u https://gist.githubusercontent.com/caseif/0783637f20fd8195635d/raw/notch-mcp-1.8.srg -o ../lib/srg/notch-mcp.srg -n "deobfuscation mappings" -ow
+# download MCP
+java net.caseif.quartz.util.Downloader \
+-u http://download1147.mediafire.com/056n9q38z1ag/56xoalz89957n7o/mcp910-pre1.zip \
+-o ../lib/mcp.zip \
+-n "MCP" \
+-ow
+# extract MCP
+echo "Extracting deobfuscation mappings, please wait..."
+java net.caseif.quartz.util.Extractor \
+-i ../lib/mcp.zip \
+-o ../lib/srg/joined.srg \
+-e conf/joined.srg \
+-ow
 
-# download SrgTools
-java net.caseif.quartz.util.Downloader -u https://bitbucket.org/agaricusb/srgtools/downloads/srgtool-2.0.jar -o ../lib/srgtool-2.0.jar -n "SrgTools" -ow
+# tweak mapping to avoid prefixing every damn import with net.minecraft.src
+java net.caseif.quartz.util.SrgTweaker ../lib/srg/joined.srg
+
+# download SrgTool
+java net.caseif.quartz.util.Downloader \
+-u http://repo.caseif.net/content/groups/public/nl/hardijzer/fw/srgtool/srgtool/2.0/srgtool-2.0.jar \
+-o ../srgtool-2.0.jar \
+-n "SrgTool" \
+-ow
 
 cd ../ # ./workspace/
 
 echo "Deobfuscating server"
-java -jar ./lib/srgtool-2.0.jar apply --srg ./lib/srg/notch-mcp.srg --in ./lib/minecraft_server-$mcVersion.jar --inheritance ./lib/minecraft_server-$mcVersion.jar --out ./lib/minecraft_server-deobf-$mcVersion.jar
+java -jar ./srgtool-2.0.jar apply \
+--srg ./lib/srg/joined.srg \
+--in ./lib/minecraft_server-$mcVersion.jar \
+--inheritance ./lib/minecraft_server-$mcVersion.jar \
+--out ./lib/minecraft_server-deobf-$mcVersion.jar
 
 echo "Done!"
