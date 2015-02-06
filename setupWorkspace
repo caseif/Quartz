@@ -29,7 +29,7 @@ java net.caseif.quartz.util.Downloader \
 
 # download MCP
 java net.caseif.quartz.util.Downloader \
--u http://download1147.mediafire.com/056n9q38z1ag/56xoalz89957n7o/mcp910-pre1.zip \
+-u https://www.dropbox.com/s/1xon92yn9w6kg3s/mcp910-pre1.zip?dl=1 \
 -o ../lib/mcp.zip \
 -n "MCP" \
 -ow
