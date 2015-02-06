@@ -39,7 +39,7 @@ java net.caseif.quartz.util.Extractor -i ../lib/mcp.zip -o ../lib/srg/joined.srg
 java net.caseif.quartz.util.Extractor -i ../lib/mcp.zip -o ../lib/srg/fields.csv -e conf/fields.csv -ow
 java net.caseif.quartz.util.Extractor -i ../lib/mcp.zip -o ../lib/srg/methods.csv -e conf/methods.csv -ow
 
-# tweak mapping to avoid prefixing every damn import with net.minecraft.src
+# splice CSVs with main SRG file
 java net.caseif.quartz.util.SrgSplicer ../lib/srg/ ../lib/srg/notch-mcp.srg
 
 # download SrgTool

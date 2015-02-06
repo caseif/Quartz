@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Remnoves the stupid base package remapping included in SRG mappings.
+ * Splices method and field descriptors with the main SRG mappings.
  */
 public class SrgSplicer {
 
@@ -66,6 +66,7 @@ public class SrgSplicer {
 
 	public static void tweakSrg(File srg, File output) throws IOException {
 		List<String> toSplice = new ArrayList<String>();
+		HashMap<String, String> classNames = new HashMap<String, String>();
 		HashMap<String, String[]> fieldDescs = new HashMap<String, String[]>();
 		HashMap<String, String[]> methodDescs = new HashMap<String, String[]>();
 		System.out.println("Splicing SRG mappings, please wait...");
@@ -86,6 +87,7 @@ public class SrgSplicer {
 						}
 						else if (type.equals("CL:")) {
 							toSplice.add(line);
+							classNames.put(expl[1], expl[2]);
 						}
 						else if (type.equals("FD:")) {
 							String notchName = expl[1];
@@ -147,9 +149,38 @@ public class SrgSplicer {
 							String mcpName = expl[1];
 							String[] desc = methodDescs.get(srgName);
 							if (desc != null) {
-								String returnType = desc[2];
-								String newDesc = "MD: " + desc[0] + " " + returnType + " " +
-										desc[1].replace(srgName, mcpName) + " " + returnType;
+								String sig = desc[2];
+								String returnType = sig.substring(sig.indexOf(")"), sig.length());
+								String newSig = "(";
+								String params = sig.substring(1, sig.indexOf(")"));
+								for (int i = 0; i < params.length(); i++) {
+									if (params.charAt(i) == 'L') {
+										newSig += "L";
+										int end = 0;
+										for (int j = i; j < params.length(); j++) {
+											if (params.charAt(j) == ';') {
+												end = j;
+												break;
+											}
+										}
+										//System.out.println(line + ", " + params + ", " + i);
+										String paramClass = params.substring(i + 1, end);
+										String newClass = classNames.get(paramClass);
+										if (newClass != null) {
+											newSig += newClass;
+										}
+										else {
+											newSig += paramClass;
+										}
+										newSig += ";";
+									}
+									else {
+										newSig += params.charAt(i);
+									}
+								}
+								newSig += returnType;
+								String newDesc = "MD: " + desc[0] + " " + newSig + " " +
+										desc[1].replace(srgName, mcpName) + " " + newSig;
 								toSplice.add(newDesc);
 								methodDescs.remove(srgName);
 							}
