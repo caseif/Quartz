@@ -20,27 +20,34 @@ javac -d ../../../workspace/java \
 ./net/caseif/quartz/util/SrgSplicer.java
 cd ../../../workspace/java/ # ./workspace/java/
 
- download vanilla server
+# download vanilla server
 java net.caseif.quartz.util.Downloader \
 -u https://s3.amazonaws.com/Minecraft.Download/versions/$mcVersion/minecraft_server.$mcVersion.jar \
 -o ../lib/minecraft_server-$mcVersion.jar \
 -n "vanilla server" \
 -ow
 
-# download MCP
 java net.caseif.quartz.util.Downloader \
--u https://www.dropbox.com/s/1xon92yn9w6kg3s/mcp910-pre1.zip?dl=1 \
--o ../lib/mcp.zip \
--n "MCP" \
+-u https://gist.githubusercontent.com/caseif/0783637f20fd8195635d/raw/notch-mcp-1.8.srg \
+-o ../lib/srg/notch-mcp-$mcVersion.srg \
+-n "deobfuscation mappings" \
 -ow
+
+# == unused at the moment ==
+# download MCP
+#java net.caseif.quartz.util.Downloader \
+#-u https://www.dropbox.com/s/1xon92yn9w6kg3s/mcp910-pre1.zip?dl=1 \
+#-o ../lib/mcp.zip \
+#-n "MCP" \
+#-ow
 # extract MCP
-echo "Extracting deobfuscation mappings, please wait..."
-java net.caseif.quartz.util.Extractor -i ../lib/mcp.zip -o ../lib/srg/joined.srg -e conf/joined.srg -ow
-java net.caseif.quartz.util.Extractor -i ../lib/mcp.zip -o ../lib/srg/fields.csv -e conf/fields.csv -ow
-java net.caseif.quartz.util.Extractor -i ../lib/mcp.zip -o ../lib/srg/methods.csv -e conf/methods.csv -ow
+#echo "Extracting deobfuscation mappings, please wait..."
+#java net.caseif.quartz.util.Extractor -i ../lib/mcp.zip -o ../lib/srg/joined.srg -e conf/joined.srg -ow
+#java net.caseif.quartz.util.Extractor -i ../lib/mcp.zip -o ../lib/srg/fields.csv -e conf/fields.csv -ow
+#java net.caseif.quartz.util.Extractor -i ../lib/mcp.zip -o ../lib/srg/methods.csv -e conf/methods.csv -ow
 
 # splice CSVs with main SRG file
-java net.caseif.quartz.util.SrgSplicer ../lib/srg/ ../lib/srg/notch-mcp.srg
+#java net.caseif.quartz.util.SrgSplicer ../lib/srg/ ../lib/srg/notch-mcp.srg
 
 # download SrgTool
 java net.caseif.quartz.util.Downloader \
@@ -52,6 +59,6 @@ java net.caseif.quartz.util.Downloader \
 cd ../ # ./workspace/
 
 echo "Deobfuscating server"
-java -jar ./lib/srgtool-2.0.jar apply --srg ./lib/srg/notch-mcp.srg --in ./lib/minecraft_server-$mcVersion.jar --inheritance ./lib/minecraft_server-$mcVersion.jar --out ./lib/minecraft_server-deobf-$mcVersion.jar
+java -jar ./lib/srgtool-2.0.jar apply --srg ./lib/srg/notch-mcp-$mcVersion.srg --in ./lib/minecraft_server-$mcVersion.jar --inheritance ./lib/minecraft_server-$mcVersion.jar --out ./lib/minecraft_server-deobf-$mcVersion.jar
 
 echo "Done!"

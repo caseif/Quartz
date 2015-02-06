@@ -25,8 +25,6 @@
 package net.caseif.quartz;
 
 import net.caseif.quartz.util.Downloader;
-import net.caseif.quartz.util.Extractor;
-import net.caseif.quartz.util.SrgSplicer;
 import net.minecraft.server.MinecraftServer;
 import nl.hardijzer.fw.applysrg.ApplySrg;
 import org.slf4j.Logger;
@@ -69,20 +67,15 @@ public class Quartz {
 					Downloader.download(new URL("https://s3.amazonaws.com/Minecraft.Download/versions/" + MC_VERSION +
 							"/minecraft_server." + MC_VERSION + ".jar"), vanilla, "vanilla server");
 				}
-				File srg = new File("lib" + File.separator + "srg", "joined.srg");
+				File srg = new File("lib" + File.separator + "srg", "notch-mcp-" + MC_VERSION + ".srg");
 				if (!srg.exists()) {
-					File mcp = new File("lib" + File.separator + "mcp", "mcp.zip");
-					if (!mcp.exists()) {
-						Downloader.download(new URL(
-								"http://download1147.mediafire.com/056n9q38z1ag/56xoalz89957n7o/mcp910-pre1.zip"
-						), mcp, "MCP");
-						Extractor.extract(new ZipFile(mcp), "conf/joined.srg", srg, false);
-						SrgSplicer.tweakSrg(srg, new File(srg.getParentFile(), "notch-mcp.srg"));
-					}
+					Downloader.download(new URL(
+							"https://gist.githubusercontent.com/caseif/0783637f20fd8195635d/raw/notch-mcp-1.8.srg"
+					), srg, "deobfuscation mappings");
 				}
 				try {
 					ApplySrg.main(new String[]{
-							"--srg", "./lib/srg/joined.srg",
+							"--srg", "./lib/srg/notch-mcp-" + MC_VERSION + ".srg",
 							"--in", "./lib/minecraft_server-" + MC_VERSION + ".jar",
 							"--inheritance", "./lib/minecraft_server-" + MC_VERSION + ".jar",
 							"--out", "./lib/minecraft_server-deobf-" + MC_VERSION + ".jar"
