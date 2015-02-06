@@ -153,18 +153,30 @@ public class SrgSplicer {
 								String returnType = sig.substring(sig.indexOf(")"), sig.length());
 								String newSig = "(";
 								String params = sig.substring(1, sig.indexOf(")"));
+								if (srgName.equals("func_177775_a")) {
+									System.out.println(params);
+								}
 								for (int i = 0; i < params.length(); i++) {
 									if (params.charAt(i) == 'L') {
+										if (srgName.equals("func_177775_a")) {
+											System.out.println(i);
+										}
 										newSig += "L";
 										int end = 0;
 										for (int j = i; j < params.length(); j++) {
 											if (params.charAt(j) == ';') {
+												if (srgName.equals("func_177775_a")) {
+													System.out.println(j);
+												}
 												end = j;
 												break;
 											}
 										}
 										//System.out.println(line + ", " + params + ", " + i);
 										String paramClass = params.substring(i + 1, end);
+										if (srgName.equals("func_177775_a")) {
+											System.out.println(paramClass);
+										}
 										String newClass = classNames.get(paramClass);
 										if (newClass != null) {
 											newSig += newClass;
@@ -173,6 +185,7 @@ public class SrgSplicer {
 											newSig += paramClass;
 										}
 										newSig += ";";
+										i = end;
 									}
 									else {
 										newSig += params.charAt(i);

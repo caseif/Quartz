@@ -20,7 +20,7 @@ javac -d ../../../workspace/java \
 ./net/caseif/quartz/util/SrgSplicer.java
 cd ../../../workspace/java/ # ./workspace/java/
 
-# download vanilla server
+ download vanilla server
 java net.caseif.quartz.util.Downloader \
 -u https://s3.amazonaws.com/Minecraft.Download/versions/$mcVersion/minecraft_server.$mcVersion.jar \
 -o ../lib/minecraft_server-$mcVersion.jar \
@@ -52,6 +52,6 @@ java net.caseif.quartz.util.Downloader \
 cd ../ # ./workspace/
 
 echo "Deobfuscating server"
-java -jar ./lib/srgtool-2.0.jar apply --srg ./lib/srg/notch-mcp.srg --in ./lib/minecraft_server-1.8.jar --inheritance ./lib/minecraft_server-1.8.jar --out ./lib/minecraft_server-deobf-1.8.jar
+java -jar ./lib/srgtool-2.0.jar apply --srg ./lib/srg/notch-mcp.srg --in ./lib/minecraft_server-$mcVersion.jar --inheritance ./lib/minecraft_server-$mcVersion.jar --out ./lib/minecraft_server-deobf-$mcVersion.jar
 
 echo "Done!"

@@ -77,7 +77,7 @@ public class Quartz {
 								"http://download1147.mediafire.com/056n9q38z1ag/56xoalz89957n7o/mcp910-pre1.zip"
 						), mcp, "MCP");
 						Extractor.extract(new ZipFile(mcp), "conf/joined.srg", srg, false);
-						SrgSplicer.tweakSrg(srg);
+						SrgSplicer.tweakSrg(srg, new File(srg.getParentFile(), "notch-mcp.srg"));
 					}
 				}
 				try {
