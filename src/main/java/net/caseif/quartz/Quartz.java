@@ -26,7 +26,7 @@ package net.caseif.quartz;
 
 import net.caseif.quartz.util.Downloader;
 import net.caseif.quartz.util.Extractor;
-import net.caseif.quartz.util.SrgTweaker;
+import net.caseif.quartz.util.SrgSplicer;
 import net.minecraft.server.MinecraftServer;
 import nl.hardijzer.fw.applysrg.ApplySrg;
 import org.slf4j.Logger;
@@ -77,7 +77,7 @@ public class Quartz {
 								"http://download1147.mediafire.com/056n9q38z1ag/56xoalz89957n7o/mcp910-pre1.zip"
 						), mcp, "MCP");
 						Extractor.extract(new ZipFile(mcp), "conf/joined.srg", srg, false);
-						SrgTweaker.tweakSrg(srg);
+						SrgSplicer.tweakSrg(srg);
 					}
 				}
 				try {

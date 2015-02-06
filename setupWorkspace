@@ -7,7 +7,7 @@ echo "Compiling Java utility classes"
 
 # javac won't run if the target doesn't exist as a directory
 [ -f  ./workspace ] && rm ./workspace # delete if normal file
-[ -d  ./workspace ] && rm -r ./workspace # delete if directory, too
+#[ -d  ./workspace ] && rm -r ./workspace # delete if directory, too
 [ -d ./workspace ] || mkdir ./workspace # create if not exists
 [ -f  ./workspace/java ] && rm ./workspace/java # delete if normal file
 [ -d ./workspace/java ] || mkdir ./workspace/java # create if not exists
@@ -17,7 +17,7 @@ cd ./src/main/java # ./src/main/java/
 javac -d ../../../workspace/java \
 ./net/caseif/quartz/util/Downloader.java \
 ./net/caseif/quartz/util/Extractor.java \
-./net/caseif/quartz/util/SrgTweaker.java
+./net/caseif/quartz/util/SrgSplicer.java
 cd ../../../workspace/java/ # ./workspace/java/
 
 # download vanilla server
@@ -35,29 +35,23 @@ java net.caseif.quartz.util.Downloader \
 -ow
 # extract MCP
 echo "Extracting deobfuscation mappings, please wait..."
-java net.caseif.quartz.util.Extractor \
--i ../lib/mcp.zip \
--o ../lib/srg/joined.srg \
--e conf/joined.srg \
--ow
+java net.caseif.quartz.util.Extractor -i ../lib/mcp.zip -o ../lib/srg/joined.srg -e conf/joined.srg -ow
+java net.caseif.quartz.util.Extractor -i ../lib/mcp.zip -o ../lib/srg/fields.csv -e conf/fields.csv -ow
+java net.caseif.quartz.util.Extractor -i ../lib/mcp.zip -o ../lib/srg/methods.csv -e conf/methods.csv -ow
 
 # tweak mapping to avoid prefixing every damn import with net.minecraft.src
-java net.caseif.quartz.util.SrgTweaker ../lib/srg/joined.srg
+java net.caseif.quartz.util.SrgSplicer ../lib/srg/ ../lib/srg/notch-mcp.srg
 
 # download SrgTool
 java net.caseif.quartz.util.Downloader \
 -u http://repo.caseif.net/content/groups/public/nl/hardijzer/fw/srgtool/srgtool/2.0/srgtool-2.0.jar \
--o ../srgtool-2.0.jar \
--n "SrgTool" \
+-o ../lib/srgtool-2.0.jar \
+-n "srgtool" \
 -ow
 
 cd ../ # ./workspace/
 
 echo "Deobfuscating server"
-java -jar ./srgtool-2.0.jar apply \
---srg ./lib/srg/joined.srg \
---in ./lib/minecraft_server-$mcVersion.jar \
---inheritance ./lib/minecraft_server-$mcVersion.jar \
---out ./lib/minecraft_server-deobf-$mcVersion.jar
+java -jar ./lib/srgtool-2.0.jar apply --srg ./lib/srg/notch-mcp.srg --in ./lib/minecraft_server-1.8.jar --inheritance ./lib/minecraft_server-1.8.jar --out ./lib/minecraft_server-deobf-1.8.jar
 
 echo "Done!"
